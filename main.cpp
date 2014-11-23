@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   //initializing Network communication
   remote.create();
 
-  /* Waiting fo Start command */
+  /* Waiting for Start command */
   while (true){
 
     remote.exec_remoteCMD();

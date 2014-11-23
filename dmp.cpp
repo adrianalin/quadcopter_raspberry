@@ -49,7 +49,7 @@
 
 #define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
 
-MPU6050 mpu;
+MPU6050 mpu(0x69);
 
 // MPU control/status vars
 uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
@@ -149,9 +149,9 @@ void DMP::initialize(){
       mpu.dmpGetGravity(&gravity, &q);
       mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
 
-       // printf("yaw = %f, pitch = %f, roll = %f\n",
-       // 	     ypr[YAW]*180/M_PI, ypr[PITCH]*180/M_PI,
-       // 	      ypr[ROLL]*180/M_PI);
+//        printf("yaw = %f, pitch = %f, roll = %f\n",
+//        	     ypr[YAW]*180/M_PI, ypr[PITCH]*180/M_PI,
+//        	      ypr[ROLL]*180/M_PI);
     }
   }
 
@@ -199,7 +199,7 @@ void DMP::getAttitude()
       ypr[i]*=180/M_PI;
     }
 
-    //printf(" %7.2f %7.2f %7.2f\n",ypr[0],ypr[1],ypr[2]);
+    printf(" %7.2f %7.2f %7.2f\n",ypr[0],ypr[1],ypr[2]);
 
 
     //unwrap yaw when it reaches 180
@@ -217,9 +217,9 @@ void DMP::getAttitude()
        gyro[i]   = (float)(g[DIM-i-1])/131.0/360.0;
      }
 
-    // printf("gyro  %7.2f %7.2f %7.2f    \n", (float)g[0]/131.0,
-    // 	   (float)g[1]/131.0,
-    // 	   (float)g[2]/131.0);
+//     printf("gyro  %7.2f %7.2f %7.2f    \n", (float)g[0]/131.0,
+//     	   (float)g[1]/131.0,
+//     	   (float)g[2]/131.0);
 
   }
 }

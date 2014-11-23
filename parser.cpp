@@ -47,71 +47,71 @@ Parser::~Parser()
 }
 
 void Parser::parse(unsigned char data[256],float &t,float ypr[]){
-  //returns thrust, yaw, pitch and roll walues form char data
+	//returns thrust, yaw, pitch and roll walues form char data
 
-  //Processing packet
-  std::string packet( reinterpret_cast< char const* > (data));
-  std::istringstream ss(packet);
-  //printf("%s \n", packet.c_str());
+	//Processing packet
+	std::string packet( reinterpret_cast< char const* > (data));
+	std::istringstream ss(packet);
+	//printf("%s \n", packet.c_str());
 
-  //Getting target values from packet
-  do
-    {
-      std::string sub;
-      ss >> sub;
-      float cmd;
+	//Getting target values from packet
+	do
+	{
+		std::string sub;
+		ss >> sub;
+		float cmd;
 
-      if (sub == "\"thr\":" ){
-	ss >> sub;
-	std::istringstream( sub ) >> cmd;
-	t = (cmd*10 + 1080);
-      }
-      else if(sub == "\"yaw\":"){
-	ss >> sub;
-	std::istringstream( sub ) >> cmd;
-	ypr[0] = cmd*3.5;
-      }
-      else if(sub == "\"pitch\":"){
-	ss >> sub;
-	std::istringstream( sub ) >> cmd;
-	ypr[1] = cmd;
-      }
-      else if(sub == "\"roll\":"){
-	ss >> sub;
-	std::istringstream( sub ) >> cmd;
-	ypr[2] = cmd;
-      }
-    } while (ss);
+		if (sub == "\"thr\":" ){
+			ss >> sub;
+			std::istringstream( sub ) >> cmd;
+			t = (cmd*10 + 1080);
+		}
+		else if(sub == "\"yaw\":"){
+			ss >> sub;
+			std::istringstream( sub ) >> cmd;
+			ypr[0] = cmd*3.5;
+		}
+		else if(sub == "\"pitch\":"){
+			ss >> sub;
+			std::istringstream( sub ) >> cmd;
+			ypr[1] = cmd;
+		}
+		else if(sub == "\"roll\":"){
+			ss >> sub;
+			std::istringstream( sub ) >> cmd;
+			ypr[2] = cmd;
+		}
+	} while (ss);
 }
 
 
 void Parser::parse(unsigned char data[],float &kp,float &ki,float &kd){
-  //returns thrust, yaw, pitch and roll walues form char data
+	//returns thrust, yaw, pitch and roll walues form char data
 
-  //Processing packet
-  std::string packet( reinterpret_cast< char const* > (data));
-  std::istringstream ss(packet);
-  //  printf("%s \n", packet.c_str());
+	//Processing packet
+	std::string packet( reinterpret_cast< char const* > (data));
+	std::istringstream ss(packet);
+	//  printf("%s \n", packet.c_str());
 
-  //Getting target values from packet
-  do
-    {
-      std::string sub;
-      ss >> sub;
+	//Getting target values from packet
+	do
+	{
+		std::string sub;
+		ss >> sub;
 
-      if (sub == "kp" ){
-	ss >> sub;
-	kp = ::atof(sub.c_str());
-      }
-      else if(sub == "ki"){
-	ss >> sub;
-	ki = ::atof(sub.c_str());
-      }
-      else if(sub == "kd"){
-	ss >> sub;
-	kd = ::atof(sub.c_str());
-      }
-    } while (ss);
+		if (sub == "kp" ){
+			ss >> sub;
+			kp = ::atof(sub.c_str());
+		}
+		else if(sub == "ki"){
+			ss >> sub;
+			ki = ::atof(sub.c_str());
+		}
+		else if(sub == "kd"){
+			ss >> sub;
+			kd = ::atof(sub.c_str());
+		}
+	} while (ss);
 }
 
 
