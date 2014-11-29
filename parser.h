@@ -19,9 +19,6 @@ class Parser{
   ~Parser();
   void parse(unsigned char data[],float &,float []);
   void parse(unsigned char data[],float &t,float &y,float &p);
-
 };
-
-extern Parser parser;
 
 #endif

@@ -35,6 +35,7 @@ public:
 	unsigned char m_data[256];
 
 private:
+	Parser m_parser;
 	sockaddr_in m_address;
 	unsigned short m_port;
 	int m_socket;

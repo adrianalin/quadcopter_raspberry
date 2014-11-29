@@ -34,8 +34,6 @@ THE SOFTWARE.
 
 #include "parser.h"
 
-Parser parser;
-
 //constructor
 Parser::Parser()
 {

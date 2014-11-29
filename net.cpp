@@ -108,8 +108,7 @@ void Socket::create()
 }
 
 
-void Socket::Close(){
-
+void Socket::Close() {
 	if ( m_socket != 0 )
 	{
 		close( m_socket );
@@ -188,7 +187,6 @@ int Socket::get_cmd(){
 
 	// printf("%d\n",type);
 	return(type);
-
 }
 
 void Socket::exec_remoteCMD()
@@ -240,26 +238,26 @@ void Socket::exec_remoteCMD()
 	case UPDATE_REMOTE:
 		//set rcinput values values
 //		printf("UPDATE_REMOTE\n");
-		parser.parse(m_data,Timer.thr,Timer.ypr_setpoint);
+		m_parser.parse(m_data,Timer.thr,Timer.ypr_setpoint);
 		break;
 
 	case UPDATE_PID_YAW_STAB:
 		//set pid constants YAW Stab
-		parser.parse(m_data,kp_,ki_,kd_);
+		m_parser.parse(m_data,kp_,ki_,kd_);
 		yprSTAB[YAW].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_YAW_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_YAW_RATE:
 		//set pid constants YAW Rate
-		parser.parse(m_data,kp_,ki_,kd_);
+		m_parser.parse(m_data,kp_,ki_,kd_);
 		yprRATE[YAW].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_YAW_RATE PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_PR_STAB:
 		//set pid constants
-		parser.parse(m_data,kp_,ki_,kd_);
+		m_parser.parse(m_data,kp_,ki_,kd_);
 		yprSTAB[PITCH].set_Kpid(kp_,ki_,kd_);
 		yprSTAB[ROLL].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_PR_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
@@ -267,7 +265,7 @@ void Socket::exec_remoteCMD()
 
 	case UPDATE_PID_PR_RATE:
 		//set pid constants
-		parser.parse(m_data,kp_,ki_,kd_);
+		m_parser.parse(m_data,kp_,ki_,kd_);
 		yprRATE[PITCH].set_Kpid(kp_,ki_,kd_);
 		yprRATE[ROLL].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_PR_RATE PID: %7.5f %7.5f %7.5f \n",kp_,ki_,kd_);

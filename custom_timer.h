@@ -1,13 +1,13 @@
 /*
- * File:   Timer.h
+ * File:   custom_timer.h
  * Author: matt
  *
  * Created on 05 November 2012, 10:19
  * Modified 01-2014, vincent jaunet
  */
 
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef CUSTOM_TIMER_H
+#define CUSTOM_TIMER_H
 
 #include <signal.h>
 #include <iostream>
@@ -34,7 +34,7 @@ class TimerClass
   struct sigaction signalAction; //signal action handler struct
   bool started;
 
-  float thr, ypr_setpoint[3];
+  float thr, ypr_setpoint[3]; // received from mobile app - thrust, yaw,pitch, roll
 
  private:
   static void sig_handler_(int signum);
@@ -56,4 +56,4 @@ class TimerClass
 };
 
 extern TimerClass Timer;
-#endif        /* TIMER_H */
+#endif        /* CUSTOM_TIMER_H */
