@@ -19,7 +19,7 @@
 #include "pid.h"
 #include "dmp.h"
 #include "parser.h"
-#include "timer.h"
+#include "custom_timer.h"
 
 
 class Socket

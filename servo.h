@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define SERVO_MIN 1000;
+#define SERVO_MIN 1000
 #define YAW 0
 #define PITCH 1
 #define ROLL 2

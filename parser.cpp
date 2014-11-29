@@ -46,8 +46,8 @@ Parser::~Parser()
 {
 }
 
-void Parser::parse(unsigned char data[256],float &t,float ypr[]){
-	//returns thrust, yaw, pitch and roll walues form char data
+void Parser::parse(unsigned char data[256], float &t, float ypr[]){
+	//returns thrust, yaw, pitch and roll values form char data
 
 	//Processing packet
 	std::string packet( reinterpret_cast< char const* > (data));
@@ -86,17 +86,19 @@ void Parser::parse(unsigned char data[256],float &t,float ypr[]){
 
 
 void Parser::parse(unsigned char data[],float &kp,float &ki,float &kd){
+	// e.g. data = pid pr_stab kp 2.4 ki 0.1 kd 0.8
 	//returns thrust, yaw, pitch and roll walues form char data
 
 	//Processing packet
 	std::string packet( reinterpret_cast< char const* > (data));
 	std::istringstream ss(packet);
+	std::string sub;
 	//  printf("%s \n", packet.c_str());
 
 	//Getting target values from packet
 	do
 	{
-		std::string sub;
+		sub.clear();
 		ss >> sub;
 
 		if (sub == "kp" ){

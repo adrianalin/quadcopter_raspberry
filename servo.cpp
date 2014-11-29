@@ -18,7 +18,7 @@
    - initlaize the ESC by sending a PWM of 1ms (~ throttle = 0)
    - write the desired PWM values
 
-*/
+ */
 
 #include <unistd.h>
 #include "servo.h"
@@ -27,84 +27,91 @@ Servo ESC;
 
 Servo::Servo()
 {
-  m_servoId[0] = 0;
-  m_servoId[1] = 1;
-  m_servoId[2] = 2;
-  m_servoId[3] = 3;
+	m_servoId[0] = 0;
+	m_servoId[1] = 1;
+	m_servoId[2] = 2;
+	m_servoId[3] = 3;
 
-  fid_servo=NULL;
+	fid_servo=NULL;
 }
 
 bool Servo::Is_open_blaster()
 {
-  if(fid_servo==NULL) {
-    //printf("servoblaster not open !!!");
-    return false;
-  }
+	if(fid_servo==NULL) {
+		//printf("servoblaster not open !!!");
+		return false;
+	}
 
-  return true;
+	return true;
 }
 
 void Servo::open_blaster()
 {
-  fid_servo=fopen("/dev/servoblaster","w");
-  if (fid_servo==NULL){
-    printf("Opening /dev/servoblaster failed \n");
-    exit(2);
-  }
+	fid_servo=fopen("/dev/servoblaster","w");
+	if (fid_servo==NULL){
+		printf("Opening /dev/servoblaster failed \n");
+		exit(2);
+	}
 }
 
 void Servo::close_blaster()
 {
-  if (fid_servo==NULL){
-     printf("/dev/servoblaster not opened \n");
-     return;
-  }
-  fclose(fid_servo);
-  fid_servo=NULL;
+	if (fid_servo==NULL){
+		printf("/dev/servoblaster not opened \n");
+		return;
+	}
+	fclose(fid_servo);
+	fid_servo=NULL;
 }
 
 
 void Servo::init()
 {
-  if(fid_servo==NULL) return;
+	if (fid_servo==NULL) return;
 
-  //initialisation of ESC
-  for (int i=0;i<4;i++){
-    servoval[i]=SERVO_MIN;
-  };
+	printf("Init servo  SERVO_MIN = %d\n", SERVO_MIN);
+	//initialisation of ESC
+	for (int i=0;i<4;i++) {
+		servoval[i]=SERVO_MIN;
+	};
 
-  setServo();
-  sleep(1);
+	for (int i = 0; i < 4; i++) {
+		setServo();
+		sleep(1);
+	}
 }
 
 void Servo::update(float throttle, float PIDoutput[DIM])
 {
-  servoval[0] =(int)(throttle + PIDoutput[PITCH] + PIDoutput[YAW]);
-  servoval[2] =(int)(throttle - PIDoutput[PITCH] + PIDoutput[YAW]);
-  servoval[1] =(int)(throttle - PIDoutput[ROLL]  - PIDoutput[YAW]);
-  servoval[3] =(int)(throttle + PIDoutput[ROLL]  - PIDoutput[YAW]);
-  setServo();
+	//  servoval[0] =(int)(throttle + PIDoutput[PITCH] + PIDoutput[YAW]);
+	//  servoval[2] =(int)(throttle - PIDoutput[PITCH] + PIDoutput[YAW]);
+	//  servoval[1] =(int)(throttle - PIDoutput[ROLL]  - PIDoutput[YAW]);
+	//  servoval[3] =(int)(throttle + PIDoutput[ROLL]  - PIDoutput[YAW]);
+//	servoval[0] =(int)(throttle + PIDoutput[PITCH]);
+//	servoval[2] =(int)(throttle - PIDoutput[PITCH]);
+	servoval[1] =(int)(throttle - PIDoutput[ROLL]);
+	servoval[3] =(int)(throttle + PIDoutput[ROLL]);
+	setServo();
 }
 
 void Servo::stopServo()
 {
-  for (int i=0;i<4;i++){
-    servoval[i]=SERVO_MIN;
-  };
+	for (int i=0;i<4;i++){
+		servoval[i]=SERVO_MIN;
+	};
 
-  setServo();
+	setServo();
 
 }
 
 void Servo::setServo()
 {
-  if (Is_open_blaster()){
-    for (int i=0;i<4;i++){
-      fprintf(fid_servo, "%d=%dus\n",m_servoId[i], servoval[i]);
-      fflush(fid_servo);
-    }
-  } else {
-    printf("Servoblaster not opened \n");
-  }
+	if (Is_open_blaster()){
+		for (int i=0;i<4;i++){
+			fprintf(fid_servo, "%d=%dus\n",m_servoId[i], servoval[i]);
+			fflush(fid_servo);
+		}
+	} else {
+		printf("Servoblaster not opened \n");
+	}
 }

@@ -48,6 +48,7 @@
 #define UPDATE_PID_PR_RATE 12
 #define UPDATE_PID_PR_STAB 13
 
+#include <string.h>
 #include "net.h"
 
 Socket remote;
@@ -117,7 +118,6 @@ void Socket::Close(){
 }
 
 int Socket::get_cmd(){
-
 	int type=0;
 
 	//returns 1 for Start
@@ -140,6 +140,7 @@ int Socket::get_cmd(){
 	sockaddr_in from;
 	socklen_t fromLength = sizeof( from );
 
+	memset(m_data, 0, size);
 	received_bytes = recvfrom( m_socket, m_data, size, 0,
 			(sockaddr*)&from,
 			&fromLength);
@@ -244,34 +245,32 @@ void Socket::exec_remoteCMD()
 
 	case UPDATE_PID_YAW_STAB:
 		//set pid constants YAW Stab
-		printf("UPDATE_PID_YAW_STAB\n");
 		parser.parse(m_data,kp_,ki_,kd_);
 		yprSTAB[YAW].set_Kpid(kp_,ki_,kd_);
+		printf("UPDATE_PID_YAW_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_YAW_RATE:
 		//set pid constants YAW Rate
-		printf("UPDATE_PID_YAW_RATE\n");
 		parser.parse(m_data,kp_,ki_,kd_);
 		yprRATE[YAW].set_Kpid(kp_,ki_,kd_);
+		printf("UPDATE_PID_YAW_RATE PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_PR_STAB:
 		//set pid constants
-		printf("UPDATE_PID_PR_STAB\n");
 		parser.parse(m_data,kp_,ki_,kd_);
 		yprSTAB[PITCH].set_Kpid(kp_,ki_,kd_);
 		yprSTAB[ROLL].set_Kpid(kp_,ki_,kd_);
-		//printf("PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
+		printf("UPDATE_PID_PR_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_PR_RATE:
 		//set pid constants
-		printf("UPDATE_PID_PR_RATE\n");
 		parser.parse(m_data,kp_,ki_,kd_);
 		yprRATE[PITCH].set_Kpid(kp_,ki_,kd_);
 		yprRATE[ROLL].set_Kpid(kp_,ki_,kd_);
-		//printf("PID: %7.5f %7.5f %7.5f \n",kp_,ki_,kd_);
+		printf("UPDATE_PID_PR_RATE PID: %7.5f %7.5f %7.5f \n",kp_,ki_,kd_);
 		break;
 
 	case INIT:
@@ -284,15 +283,17 @@ void Socket::exec_remoteCMD()
 
 		//initilization of PID constants
 		yprRATE[YAW].set_Kpid(3.5,0.1,0.1);
-		yprRATE[PITCH].set_Kpid(2.9,0.1,0.125);
-		yprRATE[ROLL].set_Kpid (2.9,0.1,0.125);
-		yprSTAB[PITCH].set_Kpid(3.3,0.035,0.04);
-		yprSTAB[ROLL].set_Kpid(3.3,0.035,0.04);
+		yprRATE[PITCH].set_Kpid(1.2, 0.02, 0.05);
+		yprRATE[ROLL].set_Kpid(1.2, 0.02, 0.05);
+
+		yprSTAB[PITCH].set_Kpid(1.9, 0.12, 0.012);
+		yprSTAB[ROLL].set_Kpid(1.9, 0.12, 0.012);
 
 		break;
 
 	case STOP_PID:
 		//On exit :
+		printf("STOP_PID\n");
 
 		//stop Timer
 		Timer.stop();
@@ -313,9 +314,11 @@ void Socket::exec_remoteCMD()
 
 	case START_PID:
 		//Remote says "Start"
+		printf("START_PID\n");
 
 		if (Timer.started){
 			//PID already running
+			printf("PID already running.\n");
 			break;
 		} else if (!imu.initialized){
 			//IMU not initialized
