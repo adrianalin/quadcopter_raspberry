@@ -1,24 +1,16 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <fstream>
 #include <sstream>
+#include <stdlib.h>
 
-class Parser{
-
- private:
-
- public:
-
-  Parser();
-  ~Parser();
-  void parse(unsigned char data[],float &,float []);
-  void parse(unsigned char data[],float &t,float &y,float &p);
+class Parser
+{
+public:
+	Parser();
+	~Parser();
+	void parse(unsigned char data[],float &,float []);
+	void parse(unsigned char data[],float &t,float &y,float &p);
 };
 
 #endif

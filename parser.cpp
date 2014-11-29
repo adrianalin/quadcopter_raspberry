@@ -28,8 +28,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-
  */
 
 #include "parser.h"
@@ -44,18 +42,16 @@ Parser::~Parser()
 {
 }
 
-void Parser::parse(unsigned char data[256], float &t, float ypr[]){
-	//returns thrust, yaw, pitch and roll values form char data
+void Parser::parse(unsigned char data[256], float &t, float ypr[])
+{
+	//returns thrust, yaw, pitch and roll values from char data
+	std::string sub;
+	std::stringstream ss;
+	ss << data;
 
-	//Processing packet
-	std::string packet( reinterpret_cast< char const* > (data));
-	std::istringstream ss(packet);
-	//printf("%s \n", packet.c_str());
-
-	//Getting target values from packet
 	do
 	{
-		std::string sub;
+		sub.clear();
 		ss >> sub;
 		float cmd;
 
@@ -83,17 +79,14 @@ void Parser::parse(unsigned char data[256], float &t, float ypr[]){
 }
 
 
-void Parser::parse(unsigned char data[],float &kp,float &ki,float &kd){
+void Parser::parse(unsigned char data[256],float &kp,float &ki,float &kd){
 	// e.g. data = pid pr_stab kp 2.4 ki 0.1 kd 0.8
-	//returns thrust, yaw, pitch and roll walues form char data
+	// returns the p, i, d terms
 
-	//Processing packet
-	std::string packet( reinterpret_cast< char const* > (data));
-	std::istringstream ss(packet);
 	std::string sub;
-	//  printf("%s \n", packet.c_str());
+	std::stringstream ss;
+	ss << data;
 
-	//Getting target values from packet
 	do
 	{
 		sub.clear();
@@ -113,5 +106,3 @@ void Parser::parse(unsigned char data[],float &kp,float &ki,float &kd){
 		}
 	} while (ss);
 }
-
-

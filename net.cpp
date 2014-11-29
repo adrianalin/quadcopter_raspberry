@@ -51,9 +51,9 @@
 #include <string.h>
 #include "net.h"
 
-Socket remote;
+Net remote;
 
-Socket::Socket()
+Net::Net()
 {
 	m_data[0] = '\0';
 	m_port = 7100;
@@ -64,33 +64,30 @@ Socket::Socket()
 }
 
 
-Socket::~Socket()
+Net::~Net()
 {
-	Close();
+	closeConnection();
 }
 
 
-void Socket::set_port(int port){
+void Net::set_port(int port){
 	//set the port to desired value
     printf("Port = %d", port);
 	m_port = port;
 }
 
 
-void Socket::create()
+void Net::create()
 {
-
 	//Opening socket
-	m_socket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-	if ( m_socket <= 0 )
-	{
+	m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (m_socket <= 0) {
 		printf( "Failed to create socket\n" );
 		exit(EXIT_FAILURE);
 	}
 
 	//Binding to desired port number
-	if ( bind( m_socket, (const sockaddr*) &m_address, sizeof(sockaddr_in) ) < 0 )
-	{
+	if (bind( m_socket, (const sockaddr*) &m_address, sizeof(sockaddr_in)) < 0) {
 		perror( "failed to bind socket");
 		exit(EXIT_FAILURE);
 	}
@@ -108,15 +105,15 @@ void Socket::create()
 }
 
 
-void Socket::Close() {
-	if ( m_socket != 0 )
-	{
-		close( m_socket );
+void Net::closeConnection()
+{
+	if (m_socket != 0) {
+		close(m_socket);
 		m_socket = 0;
 	}
 }
 
-int Socket::get_cmd(){
+int Net::get_cmd(){
 	int type=0;
 
 	//returns 1 for Start
@@ -137,12 +134,10 @@ int Socket::get_cmd(){
 
 	int received_bytes = -1;
 	sockaddr_in from;
-	socklen_t fromLength = sizeof( from );
+	socklen_t fromLength = sizeof(from);
 
 	memset(m_data, 0, size);
-	received_bytes = recvfrom( m_socket, m_data, size, 0,
-			(sockaddr*)&from,
-			&fromLength);
+	received_bytes = recvfrom( m_socket, m_data, size, 0, (sockaddr*)&from, &fromLength);
 	if (received_bytes == -1) {
 //		printf("received bytes = -1 \n");
 		return NOTHING;
@@ -189,7 +184,7 @@ int Socket::get_cmd(){
 	return(type);
 }
 
-void Socket::exec_remoteCMD()
+void Net::exec_remoteCMD()
 {
 	//PID variables
 	float kp_,ki_,kd_;
@@ -217,7 +212,7 @@ void Socket::exec_remoteCMD()
 		}
 
 		//close socket
-		Close();
+		closeConnection();
 
 		//stop servos
 		if (ESC.Is_open_blaster()){

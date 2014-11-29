@@ -1,5 +1,5 @@
-#ifndef SOCKET_H
-#define SOCKET_H
+#ifndef NET_H
+#define NET_H
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -22,28 +22,27 @@
 #include "custom_timer.h"
 
 
-class Socket
+class Net
 {
 public:
-	Socket();
-	~Socket();
-
+	Net();
+	~Net();
 	void set_port(int port);
 	void create();
-	void Close();
+	void closeConnection();
 	void exec_remoteCMD();
-	unsigned char m_data[256];
 
 private:
 	Parser m_parser;
 	sockaddr_in m_address;
 	unsigned short m_port;
 	int m_socket;
+	unsigned char m_data[256];
 	unsigned char m_lastdata[256];
 	int get_cmd(float& ,float& ,float& ,float&);
 	int get_cmd();
 };
 
-extern Socket remote;
+extern Net remote;
 
 #endif
