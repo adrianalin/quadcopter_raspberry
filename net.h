@@ -38,7 +38,7 @@ private:
 	unsigned short m_port;
 	int m_socket;
 	unsigned char m_data[256];
-	unsigned char m_lastdata[256];
+	unsigned char m_lastData[256];
 	int get_cmd(float& ,float& ,float& ,float&);
 	int get_cmd();
 };

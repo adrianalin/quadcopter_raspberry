@@ -55,7 +55,8 @@ Net remote;
 
 Net::Net()
 {
-	m_data[0] = '\0';
+	memset(m_data, 0, sizeof(m_data));
+	memset(m_lastData, 0, sizeof(m_lastData));
 	m_port = 7100;
 	m_address.sin_family = AF_INET;
 	m_address.sin_addr.s_addr = INADDR_ANY;
@@ -94,14 +95,12 @@ void Net::create()
 
 	//setting Socket to non blocking mode
 	int nonBlocking = 1;
-	if ( fcntl( m_socket, F_SETFL, O_NONBLOCK, nonBlocking ) == -1 )
+	if (fcntl( m_socket, F_SETFL, O_NONBLOCK, nonBlocking ) == -1)
 	{
 		printf( "failed to set non-blocking socket\n" );
 		exit(EXIT_FAILURE);
 	}
-
 	printf( "Succeed to create socket\nWaiting for Instructions...\n" );
-
 }
 
 
@@ -178,7 +177,7 @@ int Net::get_cmd(){
 				break;
 			}
 		} else { break; }
-	}while(ss);
+	} while(ss);
 
 	// printf("%d\n",type);
 	return(type);
@@ -189,7 +188,8 @@ void Net::exec_remoteCMD()
 	//PID variables
 	float kp_,ki_,kd_;
 
-	switch(get_cmd()){
+	switch(get_cmd())
+	{
 	//returns 1 for Start(Initialize)
 	//returns 2 for Initialize
 	//returns 10 for yawstab PID constants
