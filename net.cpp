@@ -233,7 +233,7 @@ void Net::exec_remoteCMD()
 
 	case UPDATE_REMOTE:
 		//set rcinput values values
-//		printf("UPDATE_REMOTE\n");
+//		printf("UPDATE_REMOTE m_data = %s\n", m_data);
 		m_parser.parse(m_data, m_pidComp->thr, m_pidComp->ypr_setpoint);
 		break;
 
@@ -253,9 +253,9 @@ void Net::exec_remoteCMD()
 
 	case UPDATE_PID_PR_STAB:
 		//set pid constants
-		m_parser.parse(m_data,kp_,ki_,kd_);
-		m_pidComp->yprSTAB[PITCH].set_Kpid(kp_,ki_,kd_);
-		m_pidComp->yprSTAB[ROLL].set_Kpid(kp_,ki_,kd_);
+		m_parser.parse(m_data, kp_, ki_, kd_);
+		m_pidComp->yprSTAB[PITCH].set_Kpid(kp_, ki_, kd_);
+		m_pidComp->yprSTAB[ROLL].set_Kpid(kp_, ki_, kd_);
 		printf("UPDATE_PID_PR_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 

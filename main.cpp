@@ -55,8 +55,7 @@ int main(int argc, char *argv[])
 	remote.create();
 
 	/* Waiting for Start command */
-	while (true){
-
+	while (true) {
 		//1-Get and Execute Command from remote
 		remote.exec_remoteCMD();
 		pidComp.compute();

@@ -16,6 +16,8 @@ public:
 	void  reset();
 
 private:
+	void initLimits();
+
 	//PID constants
 	float m_Kp;
 	float m_Ki;

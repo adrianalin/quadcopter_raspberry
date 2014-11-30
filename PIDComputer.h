@@ -8,6 +8,10 @@
 #ifndef PIDCOMPUTER_H_
 #define PIDCOMPUTER_H_
 
+#include <ctime>
+#include <ratio>
+#include <chrono>
+
 #include "pid.h"
 
 class DMP;
@@ -24,6 +28,7 @@ public:
 	float ypr_setpoint[3]; 	// received from mobile app - thrust, yaw,pitch, roll
 
 private:
+	std::chrono::steady_clock::time_point m_lastTime;
 	DMP* m_imu;
 	float m_PIDout[3];
 };

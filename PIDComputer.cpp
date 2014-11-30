@@ -13,11 +13,13 @@ extern Servo ESC;
 
 #define PID_STAB
 
+using namespace std::chrono;
+
 PIDComputer::PIDComputer(DMP* imu) :
 	m_imu(imu)
 {
 	// TODO Auto-generated constructor stub
-
+	initialize();
 }
 
 PIDComputer::~PIDComputer() {
@@ -37,6 +39,17 @@ void PIDComputer::initialize()
 
 void PIDComputer::compute()
 {
+	steady_clock::time_point now = steady_clock::now();
+	duration<double> time_span = duration_cast<duration<double>>(now - m_lastTime);
+
+//	if (time_span.count() < 0.005)
+//		return;
+
+	if (!m_imu->initialized || !ESC.isInitialized())
+		return;
+
+//	printf("time_span = %f seconds\n", time_span.count());
+
 	//1- get attitude of the drone
 	m_imu->getAttitude();
 
@@ -56,13 +69,13 @@ void PIDComputer::compute()
 	// 	 imu.ypr[PITCH],
 	// 	 Timer.PIDout[PITCH]);
 
-	// printf("ROLL: %7.2f %7.2f %7.2f\n",Timer.ypr_setpoint[ROLL],
-	// 	 imu.ypr[ROLL],
-	// 	 Timer.PIDout[ROLL]);
+	printf("ROLL: %7.2f %7.2f %7.2f\n", ypr_setpoint[ROLL],
+			m_imu->ypr[ROLL],
+			m_PIDout[ROLL]);
 
-	for (int i = 0; i < DIM; i++) {
-		m_PIDout[i] = yprRATE[i].update_pid_std(m_PIDout[i], m_imu->gyro[i]);
-	}
+//	for (int i = 0; i < DIM; i++) {
+//		m_PIDout[i] = yprRATE[i].update_pid_std(m_PIDout[i], m_imu->gyro[i]);
+//	}
 
 	// printf("YAW: %7.2f %7.2f %7.2f\n",Timer.ypr_setpoint[YAW],
 	// 	 imu.gyro[YAW],
@@ -91,5 +104,6 @@ void PIDComputer::compute()
 
 
 	ESC.update(thr, m_PIDout);
+	m_lastTime = now;
 	//printf("%7.2f  %7.2f\n",Timer.thr,Timer.PIDout[ROLL]);
 }

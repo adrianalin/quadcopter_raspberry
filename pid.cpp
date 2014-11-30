@@ -52,10 +52,8 @@ PID::PID()
 	//PID variables
 	m_err = 0;
 	m_lastInput= 0;
-	m_outmax =  350;
-	m_outmin = -350;
+	initLimits();
 }
-
 
 PID::PID(float kp_,float ki_,float kd_)
 {
@@ -67,8 +65,13 @@ PID::PID(float kp_,float ki_,float kd_)
 	//PID variables
 	m_err = 0;
 	m_lastInput= 0;
-	m_outmax =  400;
-	m_outmin = -400;
+	initLimits();
+}
+
+void PID::initLimits()
+{
+	m_outmax =  30;
+	m_outmin = -30;
 }
 
 float PID::update_pid_std(float setpoint, float input)
@@ -84,9 +87,11 @@ float PID::update_pid_std(float setpoint, float input)
 	m_output = m_Kp * m_err + m_ITerm - m_Kd * dInput;
 
 	if (m_output > m_outmax) {
-		m_output   = m_outmax;
+		m_ITerm = 0;
+		m_output = m_outmax;
 	} else if (m_output < m_outmin) {
-		m_output   = m_outmin;
+		m_ITerm = 0;
+		m_output = m_outmin;
 	}
 
 	m_lastInput= input;
@@ -103,14 +108,11 @@ void PID::reset()
 	m_lastInput = 0;
 }
 
-
-
 void PID::set_Kpid(float Kp,float Ki, float Kd)
 {
 	m_Kp = Kp;
 	m_Ki = Ki;
 	m_Kd = Kd;
-
 }
 
 void PID::set_windup_bounds(float Min,float Max)
