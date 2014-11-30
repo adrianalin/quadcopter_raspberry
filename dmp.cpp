@@ -63,8 +63,6 @@ int32_t g[3];              // [x, y, z]            gyro vector
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 
-DMP imu;
-
 DMP::DMP()
 {
 	dmpReady=true;
@@ -167,12 +165,15 @@ void DMP::initialize(){
 
 void DMP::getAttitude()
 {
-	if (!dmpReady) return;
+	if (!dmpReady) {
+		printf("DMP not ready!\n");
+		return;
+	}
 
 	// wait for FIFO count > 42 bits
 	do {
 		fifoCount = mpu.getFIFOCount();
-	}while (fifoCount<42);
+	}while (fifoCount < 42);
 
 	if (fifoCount == 1024) {
 		// reset so we can continue cleanly

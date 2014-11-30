@@ -99,9 +99,7 @@ void Servo::stopServo()
 	for (int i=0;i<4;i++){
 		servoval[i]=SERVO_MIN;
 	};
-
 	setServo();
-
 }
 
 void Servo::setServo()

@@ -26,6 +26,4 @@ class DMP {
   float gyro[3];
 };
 
-extern DMP imu;
-
 #endif

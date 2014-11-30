@@ -48,15 +48,25 @@
 #define UPDATE_PID_PR_RATE 12
 #define UPDATE_PID_PR_STAB 13
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <assert.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sstream>
 #include <string.h>
+
+#include "PIDComputer.h"
 #include "net.h"
 
-Net remote;
-
-Net::Net()
+Net::Net(PIDComputer* pidComp, DMP* imu) :
+		m_pidComp(pidComp),
+		m_imu(imu)
 {
 	memset(m_data, 0, sizeof(m_data));
 	memset(m_lastData, 0, sizeof(m_lastData));
+	m_socket = 0;
 	m_port = 7100;
 	m_address.sin_family = AF_INET;
 	m_address.sin_addr.s_addr = INADDR_ANY;
@@ -64,19 +74,16 @@ Net::Net()
     printf("Port = %d\n", m_port);
 }
 
-
 Net::~Net()
 {
 	closeConnection();
 }
-
 
 void Net::set_port(int port){
 	//set the port to desired value
     printf("Port = %d", port);
 	m_port = port;
 }
-
 
 void Net::create()
 {
@@ -103,7 +110,6 @@ void Net::create()
 	printf( "Succeed to create socket\nWaiting for Instructions...\n" );
 }
 
-
 void Net::closeConnection()
 {
 	if (m_socket != 0) {
@@ -112,7 +118,8 @@ void Net::closeConnection()
 	}
 }
 
-int Net::get_cmd(){
+int Net::get_cmd()
+{
 	int type=0;
 
 	//returns 1 for Start
@@ -205,12 +212,6 @@ void Net::exec_remoteCMD()
 		//On Shutdown :
 		printf("SHUTDOWN\n");
 
-		//stop Timer
-		Timer.stop();
-		if (Timer.started){
-			printf("toto");
-		}
-
 		//close socket
 		closeConnection();
 
@@ -233,63 +234,51 @@ void Net::exec_remoteCMD()
 	case UPDATE_REMOTE:
 		//set rcinput values values
 //		printf("UPDATE_REMOTE\n");
-		m_parser.parse(m_data,Timer.thr,Timer.ypr_setpoint);
+		m_parser.parse(m_data, m_pidComp->thr, m_pidComp->ypr_setpoint);
 		break;
 
 	case UPDATE_PID_YAW_STAB:
 		//set pid constants YAW Stab
 		m_parser.parse(m_data,kp_,ki_,kd_);
-		yprSTAB[YAW].set_Kpid(kp_,ki_,kd_);
+		m_pidComp->yprSTAB[YAW].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_YAW_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_YAW_RATE:
 		//set pid constants YAW Rate
 		m_parser.parse(m_data,kp_,ki_,kd_);
-		yprRATE[YAW].set_Kpid(kp_,ki_,kd_);
+		m_pidComp->yprRATE[YAW].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_YAW_RATE PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_PR_STAB:
 		//set pid constants
 		m_parser.parse(m_data,kp_,ki_,kd_);
-		yprSTAB[PITCH].set_Kpid(kp_,ki_,kd_);
-		yprSTAB[ROLL].set_Kpid(kp_,ki_,kd_);
+		m_pidComp->yprSTAB[PITCH].set_Kpid(kp_,ki_,kd_);
+		m_pidComp->yprSTAB[ROLL].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_PR_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_PR_RATE:
 		//set pid constants
 		m_parser.parse(m_data,kp_,ki_,kd_);
-		yprRATE[PITCH].set_Kpid(kp_,ki_,kd_);
-		yprRATE[ROLL].set_Kpid(kp_,ki_,kd_);
+		m_pidComp->yprRATE[PITCH].set_Kpid(kp_,ki_,kd_);
+		m_pidComp->yprRATE[ROLL].set_Kpid(kp_,ki_,kd_);
 		printf("UPDATE_PID_PR_RATE PID: %7.5f %7.5f %7.5f \n",kp_,ki_,kd_);
 		break;
 
 	case INIT:
 		//intialization of IMU
 		printf("INIT\n");
-		if (!Timer.started && !imu.initialized){
-			imu.set_com();
-			imu.initialize();
+		if (!m_imu->initialized) {
+			m_imu->set_com();
+			m_imu->initialize();
 		}
-
-		//initilization of PID constants
-		yprRATE[YAW].set_Kpid(3.5,0.1,0.1);
-		yprRATE[PITCH].set_Kpid(1.2, 0.02, 0.05);
-		yprRATE[ROLL].set_Kpid(1.2, 0.02, 0.05);
-
-		yprSTAB[PITCH].set_Kpid(1.9, 0.12, 0.012);
-		yprSTAB[ROLL].set_Kpid(1.9, 0.12, 0.012);
-
 		break;
 
 	case STOP_PID:
 		//On exit :
 		printf("STOP_PID\n");
-
-		//stop Timer
-		Timer.stop();
 
 		//stop servos
 		if (ESC.Is_open_blaster()){
@@ -298,22 +287,16 @@ void Net::exec_remoteCMD()
 		}
 
 		//reset PID
-		for (int i=0;i<DIM;i++) yprSTAB[i].reset();
-		for (int i=0;i<DIM;i++) yprRATE[i].reset();
-
+		for (int i=0;i<DIM;i++) m_pidComp->yprSTAB[i].reset();
+		for (int i=0;i<DIM;i++) m_pidComp->yprRATE[i].reset();
 		printf("PID Stopped \n");
 		break;
-
 
 	case START_PID:
 		//Remote says "Start"
 		printf("START_PID\n");
 
-		if (Timer.started){
-			//PID already running
-			printf("PID already running.\n");
-			break;
-		} else if (!imu.initialized){
+		if (!m_imu->initialized) {
 			//IMU not initialized
 			printf("DMP not Initalized\n Can't start...\n");
 			break;
@@ -324,14 +307,6 @@ void Net::exec_remoteCMD()
 		ESC.open_blaster();
 		ESC.init();
 		printf("                     ... DONE.\n");
-
-		//Things are getting started !
-		//launch the Alarm signal
-		Timer.start();
-		while (Timer.started){
-			sleep(1000);
-		}
-
 	}//end switch
 
 	return;
