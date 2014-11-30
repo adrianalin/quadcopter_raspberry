@@ -10,7 +10,7 @@ class PID {
 public:
 	PID();
 	PID(float,float,float);
-	bool update_pid_std(float setpt, float input);
+	float update_pid_std(float setpt, float input);
 	void  set_Kpid(float, float, float);
 	void  set_windup_bounds(float, float);
 	void  reset();
@@ -28,7 +28,6 @@ private:
 	float m_outmax;
 	float m_outmin;
 	float m_output;
-	clock_t m_lastTime;
 };
 
 #endif

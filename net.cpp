@@ -304,8 +304,8 @@ void Net::exec_remoteCMD()
 
 		//Initializing ESCs
 		printf("Initialization of ESC...\n");
-		ESC.open_blaster();
-		ESC.init();
+		ESC.openBlaster();
+		ESC.initialize();
 		printf("                     ... DONE.\n");
 	}//end switch
 

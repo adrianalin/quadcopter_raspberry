@@ -15,21 +15,22 @@
 
 class Servo {
 
-private:
-  int m_servoId[4];
-  FILE* fid_servo;
-
 public:
-  Servo();
-  void open_blaster();
-  void close_blaster();
-  bool Is_open_blaster();
-  void init();
-  void update(float, float []);
-  void stopServo();
-  void setServo();
+	Servo();
+	void openBlaster();
+	void close_blaster();
+	bool Is_open_blaster();
+	void initialize();
+	bool isInitialized();
+	void update(float, float []);
+	void stopServo();
+	void setServo();
+	int servoval[4];
 
-  int servoval[4];
+private:
+	bool m_initialized;
+	int m_servoId[4];
+	FILE* fid_servo;
 };
 
 extern Servo ESC;

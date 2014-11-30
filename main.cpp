@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 		//1-Get and Execute Command from remote
 		remote.exec_remoteCMD();
 		pidComp.compute();
-
+		usleep(2000);
 	}//end
 
 	return 0;

@@ -32,31 +32,31 @@ Servo::Servo()
 	m_servoId[2] = 2;
 	m_servoId[3] = 3;
 
-	fid_servo=NULL;
+	fid_servo = nullptr;
+	m_initialized = false;
 }
 
-bool Servo::Is_open_blaster()
+void Servo::openBlaster()
 {
-	if(fid_servo==NULL) {
-		//printf("servoblaster not open !!!");
-		return false;
-	}
-
-	return true;
-}
-
-void Servo::open_blaster()
-{
-	fid_servo=fopen("/dev/servoblaster","w");
-	if (fid_servo==NULL){
+	fid_servo = fopen("/dev/servoblaster","w");
+	if (fid_servo == NULL) {
 		printf("Opening /dev/servoblaster failed \n");
 		exit(2);
 	}
 }
 
+bool Servo::Is_open_blaster()
+{
+	if (fid_servo == nullptr) {
+		//printf("servoblaster not open !!!");
+		return false;
+	}
+	return true;
+}
+
 void Servo::close_blaster()
 {
-	if (fid_servo==NULL){
+	if (fid_servo == NULL){
 		printf("/dev/servoblaster not opened \n");
 		return;
 	}
@@ -65,9 +65,12 @@ void Servo::close_blaster()
 }
 
 
-void Servo::init()
+void Servo::initialize()
 {
-	if (fid_servo==NULL) return;
+	if (fid_servo == NULL) {
+		printf("Servo not initialized\n");
+		return;
+	}
 
 	printf("Init servo  SERVO_MIN = %d\n", SERVO_MIN);
 	//initialisation of ESC
@@ -79,6 +82,13 @@ void Servo::init()
 		setServo();
 		sleep(1);
 	}
+
+	m_initialized = true;
+}
+
+bool Servo::isInitialized()
+{
+	return m_initialized;
 }
 
 void Servo::update(float throttle, float PIDoutput[DIM])
@@ -104,8 +114,8 @@ void Servo::stopServo()
 
 void Servo::setServo()
 {
-	if (Is_open_blaster()){
-		for (int i=0;i<4;i++){
+	if (Is_open_blaster()) {
+		for (int i=0;i<4;i++) {
 			fprintf(fid_servo, "%d=%dus\n",m_servoId[i], servoval[i]);
 			fflush(fid_servo);
 		}

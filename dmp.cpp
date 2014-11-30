@@ -36,6 +36,8 @@
 
  */
 
+#include "dmp.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -43,13 +45,12 @@
 #include <string.h>
 #include <math.h>
 
-#include "dmp.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "I2Cdev.h"
 
-#define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
-
 MPU6050 mpu(0x69);
+
+#define wrap_180(x) (x < -180 ? x+360 : (x > 180 ? x - 360: x))
 
 // MPU control/status vars
 uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
@@ -73,10 +74,6 @@ DMP::DMP()
 
 }
 
-
-//---------------------------
-//         mpu setup
-//---------------------------
 void DMP::set_com() {
 	// initialize device
 	printf("Initializing I2C devices...\n");
@@ -116,8 +113,7 @@ void DMP::set_com() {
 	}
 }
 
-void DMP::initialize(){
-
+void DMP::initialize() {
 	//This routine waits for the yaw angle to stop
 	//drifting
 
@@ -125,8 +121,7 @@ void DMP::initialize(){
 
 	printf("Initializing IMU...\n");
 
-	for (int n=1;n<3500;n++) {
-
+	for (int n = 1; n < 2500; n++) {
 		// wait for FIFO count > 42 bits
 		do {
 			fifoCount = mpu.getFIFOCount();
@@ -147,9 +142,9 @@ void DMP::initialize(){
 			mpu.dmpGetGravity(&gravity, &q);
 			mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
 
-			//        printf("yaw = %f, pitch = %f, roll = %f\n",
-			//        	     ypr[YAW]*180/M_PI, ypr[PITCH]*180/M_PI,
-			//        	      ypr[ROLL]*180/M_PI);
+			printf("yaw = %f, pitch = %f, roll = %f\n",
+					ypr[YAW]*180/M_PI, ypr[PITCH]*180/M_PI,
+					ypr[ROLL]*180/M_PI);
 		}
 	}
 
@@ -161,7 +156,6 @@ void DMP::initialize(){
 			ypr[ROLL]*180/M_PI);
 	initialized = true;
 }
-
 
 void DMP::getAttitude()
 {

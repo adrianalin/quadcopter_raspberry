@@ -54,7 +54,6 @@ PID::PID()
 	m_lastInput= 0;
 	m_outmax =  350;
 	m_outmin = -350;
-	m_lastTime = 0;
 }
 
 
@@ -70,41 +69,33 @@ PID::PID(float kp_,float ki_,float kd_)
 	m_lastInput= 0;
 	m_outmax =  400;
 	m_outmin = -400;
-	m_lastTime = 0;
 }
 
-bool PID::update_pid_std(float setpoint, float input)
+float PID::update_pid_std(float setpoint, float input)
 {
-	clock_t now = clock();
-	clock_t dt = (now - m_lastTime);
+	//Computes error
+	m_err = setpoint-input;
+	m_ITerm += (m_Ki * m_err);
+	if (m_ITerm > m_outmax) m_ITerm = m_outmax;
+	else if (m_ITerm < m_outmin) m_ITerm = m_outmin;
+	float dInput = (input - m_lastInput);
 
-	if (dt/CLOCKS_PER_SEC > 0.5) {
-		//Computes error
-		m_err = setpoint-input;
-		m_ITerm += (m_Ki * m_err);
-		if (m_ITerm > m_outmax) m_ITerm = m_outmax;
-		else if (m_ITerm < m_outmin) m_ITerm = m_outmin;
-		float dInput = (input - m_lastInput);
+	/*Compute PID Output*/
+	m_output = m_Kp * m_err + m_ITerm - m_Kd * dInput;
 
-		/*Compute PID Output*/
-		m_output = m_Kp * m_err + m_ITerm - m_Kd * dInput;
-
-		if (m_output > m_outmax) {
-			m_output   = m_outmax;
-		} else if (m_output < m_outmin) {
-			m_output   = m_outmin;
-		}
-
-		m_lastInput= input;
-		m_lastTime = now;
-
-		//printf("kp %f ki %f kd %f\n", m_Kp, m_Ki, m_Kd);
-		//printf("setpt %7.2f input   %7.2f output   %f\n", setpoint, input, m_output);
-		//printf("err   %7.2f ddt_err %7.2f sum_err  %7.2f\n", m_err, m_ddt_err, m_sum_err);
-
-		return true;
+	if (m_output > m_outmax) {
+		m_output   = m_outmax;
+	} else if (m_output < m_outmin) {
+		m_output   = m_outmin;
 	}
-	return false;
+
+	m_lastInput= input;
+	return m_output;
+
+	//printf("kp %f ki %f kd %f\n", m_Kp, m_Ki, m_Kd);
+	//printf("setpt %7.2f input   %7.2f output   %f\n", setpoint, input, m_output);
+	//printf("err   %7.2f ddt_err %7.2f sum_err  %7.2f\n", m_err, m_ddt_err, m_sum_err);
+
 }
 
 void PID::reset()
