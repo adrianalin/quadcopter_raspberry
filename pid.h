@@ -10,13 +10,15 @@ class PID {
 public:
 	PID();
 	PID(float,float,float);
-	float update_pid_std(float setpt, float input);
+	float update_pid_std(float setpt, float input, float dt);
 	void  set_Kpid(float, float, float);
 	void  set_windup_bounds(float, float);
 	void  reset();
 
 private:
 	void initLimits();
+	float m_sum_err;
+	float m_ddt_err;
 
 	//PID constants
 	float m_Kp;

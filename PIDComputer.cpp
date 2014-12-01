@@ -60,8 +60,8 @@ void PIDComputer::compute()
 #ifdef PID_STAB
 	//Stabilization is only done on Pitch and Roll
 	//Yaw is Rate PID only
-	for (int i=1; i<DIM; i++) {
-		m_PIDout[i] = yprSTAB[i].update_pid_std(ypr_setpoint[i], m_imu->ypr[i]);
+	for (int i = 1; i < DIM; i++) {
+		m_PIDout[i] = yprSTAB[i].update_pid_std(ypr_setpoint[i], m_imu->ypr[i], time_span.count());
 	}
 	m_PIDout[0] = ypr_setpoint[0];
 

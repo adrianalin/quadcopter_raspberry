@@ -254,9 +254,9 @@ void Net::exec_remoteCMD()
 	case UPDATE_PID_PR_STAB:
 		//set pid constants
 		m_parser.parse(m_data, kp_, ki_, kd_);
+		printf("UPDATE_PID_PR_STAB PID: %f %f %f \n",kp_,ki_,kd_);
 		m_pidComp->yprSTAB[PITCH].set_Kpid(kp_, ki_, kd_);
 		m_pidComp->yprSTAB[ROLL].set_Kpid(kp_, ki_, kd_);
-		printf("UPDATE_PID_PR_STAB PID: %7.2f %7.2f %7.2f \n",kp_,ki_,kd_);
 		break;
 
 	case UPDATE_PID_PR_RATE:
